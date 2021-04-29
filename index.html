@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>画图板</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <canvas id="canvas" width="" height=""></canvas>
+    <script>
+      let canvas = document.getElementById("canvas");
+      /* 通过"id"指向canvas */
+
+      canvas.width = document.documentElement.clientWidth;
+      canvas.height = document.documentElement.clientHeight;
+      /* "id"canvas的宽高对象指向当前浏览器页面的宽高 */
+
+      let ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "black";
+      ctx.strokeStyle = "black";
+      ctx.lineWidth = 8;
+      ctx.lineCap = "round";
+      /* 设置内容ctx(context)样式元素 */
+
+      let painting = false;
+      /* 设置红灯 */
+      let last;
+      /* 设置上一次网页client空坐标 */
+
+      var isTouchDevice = "ontouchstart" in document.documentElement;
+      /* 检测touch设备触屏事件 */
+
+      if (isTouchDevice) {
+        canvas.ontouchstart = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          last = [x, y];
+        };
+        canvas.ontouchmove = (e) => {
+          let x = e.touches[0].clientX;
+          let y = e.touches[0].clientY;
+          drawLine(last[0], last[1], x, y);
+          last = [x, y];
+        };
+        /* touch设备划线，把touch、滑动的最后次坐标赋值到上次变量更新完成连线 */
+      } else {
+        canvas.onmousedown = (e) => {
+          painting = true;
+          last = [e.clientX, e.clientY];
+        };
+
+        canvas.onmousemove = (e) => {
+          if (painting === true) {
+            drawLine(last[0], last[1], e.clientX, e.clientY);
+            last = [e.clientX, e.clientY];
+          }
+        };
+
+        canvas.onmouseup = () => {
+          painting = false;
+        };
+      }
+      /* 鼠标同上，鼠标按键抬起红灯 */
+      function drawLine(x1, y1, x2, y2) {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+    </script>
+  </body>
+</html>
